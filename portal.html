@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Portal Colaborativo</title>
+    <meta name="description" content="Acesso rápido às ferramentas e plataformas da NekoWeb.">
+    <meta name="keywords" content="educação, plataforma, cursos, geradores, coordenação">
+    
+    <!-- Tailwind CSS via CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css"/>
+    
+    <!-- Fonte do Google -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet">
+
+    <!-- Estilos Personalizados -->
+    <style>
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: #E0F2FF; /* Fundo azul suave */
+        }
+
+        /* Container com largura máxima de 980px */
+        .container-max {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Cabeçalho com imagem limitada a 980px */
+        .header-image {
+            max-width: 980px;
+            margin: 0 auto;
+            height: 200px; /* Altura ajustável para mobile */
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px; /* Bordas arredondadas */
+            box-shadow: 
+                8px 8px 16px rgba(0, 0, 0, 0.1), 
+                -8px -8px 16px rgba(255, 255, 255, 0.7); /* Efeito neumórfico */
+        }
+
+        /* Ajustes para mobile */
+        @media (max-width: 640px) {
+            .header-image {
+                height: 150px; /* Altura menor para mobile */
+            }
+            .header-image h1 {
+                font-size: 2rem; /* Título menor para mobile */
+            }
+            .header-image p {
+                font-size: 1rem; /* Subtítulo menor para mobile */
+            }
+        }
+
+        /* Estilo do modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #E0F2FF; /* Fundo azul suave */
+            width: 90%;
+            max-width: 900px;
+            height: 80%;
+            border-radius: 20px; /* Bordas arredondadas */
+            box-shadow: 
+                12px 12px 24px rgba(0, 0, 0, 0.2), 
+                -12px -12px 24px rgba(255, 255, 255, 0.8); /* Efeito neumórfico */
+            overflow: hidden;
+        }
+
+        .modal-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #E0F2FF; /* Fundo azul suave */
+            color: #333; /* Cor do texto */
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px; /* Bordas arredondadas */
+            box-shadow: 
+                3px 3px 6px rgba(0, 0, 0, 0.1), 
+                -3px -3px 6px rgba(255, 255, 255, 0.7); /* Efeito neumórfico */
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            box-shadow: 
+                5px 5px 10px rgba(0, 0, 0, 0.15), 
+                -5px -5px 10px rgba(255, 255, 255, 0.8); /* Efeito neumórfico no hover */
+            transform: translateY(-2px); /* Eleva o botão */
+        }
+
+        .modal-close:active {
+            box-shadow: 
+                inset 3px 3px 6px rgba(0, 0, 0, 0.1), 
+                inset -3px -3px 6px rgba(255, 255, 255, 0.7); /* Efeito de rebaixo ao clicar */
+            transform: translateY(0);
+        }
+
+        /* Efeito de hover nos cards */
+        .card {
+            background: #E0F2FF; /* Fundo azul suave */
+            border-radius: 20px; /* Bordas arredondadas */
+            box-shadow: 
+                8px 8px 16px rgba(0, 0, 0, 0.1), 
+                -8px -8px 16px rgba(255, 255, 255, 0.7); /* Efeito neumórfico */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px); /* Eleva o card */
+            box-shadow: 
+                12px 12px 24px rgba(0, 0, 0, 0.15), 
+                -12px -12px 24px rgba(255, 255, 255, 0.8); /* Efeito neumórfico no hover */
+        }
+
+        /* Ajustes para as imagens dos cards */
+        .card img {
+            width: 100%; /* Ocupa 100% da largura do card */
+            height: 200px; /* Altura fixa para as imagens */
+            object-fit: cover; /* Garante que a imagem cubra o espaço sem distorção */
+        }
+
+        .card-content {
+            padding: 1.5rem; /* Mais espaço interno */
+        }
+
+        .card-footer {
+            background-color: #B3E5FC; /* Cor de fundo do footer do card (azul mais claro) */
+            padding: 1rem;
+            text-align: center;
+            border-radius: 0 0 20px 20px; /* Bordas arredondadas apenas na parte inferior */
+        }
+
+        /* Estilo do botão principal */
+        .btn-primary {
+            background: #E0F2FF; /* Fundo azul suave */
+            border: none;
+            border-radius: 15px; /* Bordas arredondadas */
+            box-shadow: 
+                5px 5px 10px rgba(0, 0, 0, 0.1), 
+                -5px -5px 10px rgba(255, 255, 255, 0.7); /* Efeito neumórfico */
+            padding: 12px 24px;
+            font-size: 1rem;
+            color: #333; /* Cor do texto */
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 
+                8px 8px 16px rgba(0, 0, 0, 0.15), 
+                -8px -8px 16px rgba(255, 255, 255, 0.8); /* Efeito neumórfico no hover */
+            transform: translateY(-2px); /* Eleva o botão */
+        }
+
+        .btn-primary:active {
+            box-shadow: 
+                inset 5px 5px 10px rgba(0, 0, 0, 0.1), 
+                inset -5px -5px 10px rgba(255, 255, 255, 0.7); /* Efeito de rebaixo ao clicar */
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="leading-normal tracking-normal text-gray-900">
+
+    <!-- Cabeçalho com Imagem -->
+    <header class="header-image" style="background-image: url('https://educ.nekoweb.org/cursos/capa.jpg');">
+        <div class="w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-6xl font-bold text-white">Educa</h1>
+                <p class="text-lg md:text-2xl text-gray-200 mt-4">Espaço Digital Unificado para Colaboração e Apoio</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <div class="container-max py-8">
+        <!-- Título da Seção -->
+        <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">Acesse Nossas Soluções</h2>
+
+        <!-- Cards de Navegação com Imagens -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Card 1: Geradores -->
+            <a href="https://educ.nekoweb.org/geradores/landing.html" class="card">
+                <img src="https://educ.nekoweb.org/prompts.jpg" alt="Geradores">
+                <div class="card-content">
+                    <h3 class="text-lg font-semibold text-blue-600 mb-2">Ferramentas de Iteligência Artificial para professores</h3>
+                    <p class="text-sm text-gray-600">Ferramentas para criação de recursos didáticos usando IA.</p>
+                </div>
+                <div class="card-footer">
+                    <span class="text-blue-600 font-medium">Acessar →</span>
+                </div>
+            </a>
+
+            <!-- Card 2: Plataforma -->
+            <a href="https://educ.nekoweb.org/areadoaluno/prepaginacoordenacao.html" class="card">
+                <img src="https://educ.nekoweb.org/plataforma.jpg" alt="Plataforma">
+                <div class="card-content">
+                    <h3 class="text-lg font-semibold text-blue-600 mb-2">Gestão Pedagógica e soluções para coordenação</h3>
+                    <p class="text-sm text-gray-600">Acesso às informações e recursos para os coordenadores(as e alunos.</p>
+                </div>
+                <div class="card-footer">
+                    <span class="text-blue-600 font-medium">Acessar →</span>
+                </div>
+            </a>
+
+            <!-- Card 3: Cursos -->
+            <a href="https://educ.nekoweb.org/cursos/landingcurso.html" class="card">
+                <img src="https://educ.nekoweb.org/para%20educadores.png" alt="Cursos">
+                <div class="card-content">
+                    <h3 class="text-lg font-semibold text-blue-600 mb-2">Cursos online com temas atuais gratuitos para professores</h3>
+                    <p class="text-sm text-gray-600">Explore nossos cursos disponíveis para você, professor e professora..</p>
+                </div>
+                <div class="card-footer">
+                    <span class="text-blue-600 font-medium">Acessar →</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Botão para abrir o modal -->
+        <div class="text-center mt-8">
+            <button onclick="openModal()" class="btn-primary">
+                Relatório da ONU sobre IA na Educação
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <iframe src="https://educ.nekoweb.org/geradores%2Fferramentas/slide.html" class="modal-iframe"></iframe>
+            <button onclick="closeModal()" class="modal-close">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Script para controlar o modal -->
+    <script>
+        function openModal() {
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('open');
+        }
+    </script>
+</body>
+</html>
